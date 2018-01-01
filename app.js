@@ -1,24 +1,45 @@
+//libraries
 var express = require('express');
 var app = express();
-var mongo = require('mongodb');
+var mongoose = require('mongoose');
 var crypt = require('crypto');
+var bodyParser = require('body-parser');
 
-var mongodb = mongo.MongoClient;
 
+//database connect
 var url = "mongodb://localhost:27017/Nycia";
+mongoose.createConnection(url,{
+	useMongoClient: true,
+});
+
+//bodyparser
+app.use(bodyParser());
+//set viewEngine
+app.set('view engine', 'ejs');
+
+var userSchema = mongoose.Schema({
+	name: String,
+	email: String,
+	password: String,
+	phone_no: String,
+});
+
+app.get('/',function(req, res){
+	res.render('index');
+});
 
 app.post('/login', function(req, res){
 
-	// console.log(req.params);
-	// var user = {
-	// 	user: {
-	// 		username: req.params.name,
-	// 		password: req.params.pass
-	// 	}
-	// };
-	// res.end(JSON.stringify(user));
+	console.log(req.body);
+	var user = {
+		user: {
+			username: req.body.name,
+			password: req.body.lastname
+		}
+	};
+	res.end(JSON.stringify(user));
 	console.log("works");
-	res.end("working");
+	// res.end("working");
 
 });
 
@@ -27,7 +48,7 @@ app.post('/signup',function(req, res){
 	mongodb.connect(url, function(err, db) {
 	  if (err) throw err;
 	  const pass = crypt.createHash('sha256', 'password123')
-	  console.log(pass);
+	  // console.log(pass);
 	  var user = {name: "Jatin", password: pass};
 	  db.collection("Users").insertOne(user, function(err,data){
 	  	if(err) throw err;
