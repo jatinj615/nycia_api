@@ -8,10 +8,17 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
-		<form action="/login" method="post">
+		<form action="/signup" method="post">
 			FirstName: <input type="text" name="name"><br>
-			LastName: <input type="text" name="lastname"><br>
+			email: <input type="text" name="email">
+			phone_no: <input type="text" name="phone_no">
+			password: <input type="password" name="password">
 			<button type="submit">Signup</button>
+		</form>
+		<form action="/login" method="post">
+			<input type="text" name="email">
+			<input type="password" name="password">
+			<input type="submit" name="Login" value="Login">
 		</form>
 </body>
 <script></script>
