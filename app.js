@@ -27,7 +27,11 @@ var userSchema = mongoose.Schema({
 
 //saloon schema
 var saloonSchema = mongoose.Schema({
-
+	name: String,
+	address: String,
+	email: String,
+	password: String,
+	phone_no: String
 });
 
 
@@ -44,7 +48,7 @@ app.post('/login', function(req, res){
 	//use token for different search for user and saloons
 	var token = 'users';
 	if(token == 'users'){
-		var user = User.findOne({email: req.body.email},function(err,data){
+		User.findOne({email: req.body.email},function(err,data){
 			if(err) throw err;
 			var hashPass = data.password;
 			if( bcrypt.compareSync(req.body.password,hashPass)){
@@ -54,7 +58,13 @@ app.post('/login', function(req, res){
 		// console.log(JSON.stringify(user));
 		// res.end(user);		
 	}else if(token == 'saloons'){
-
+		Saloon.findOne({email: req.body.email},function(err,data){
+			if(err) throw err;
+			var hashPass = data.password;
+			if( bcrypt.compareSync(req.body.password,hashPass)){
+				res.end(JSON.stringify(data));
+			}
+		});
 	}
 });
 
@@ -81,7 +91,23 @@ app.post('/signup',function(req, res){
 			}
 		});
 	}else if(token == 'saloons'){
-
+		var saloon = req.body;
+		var hashPass = bcrypt.hashSync(user.password, 10);
+		var item = Saloon({
+			name: saloon.name,
+			address: saloon.address,
+			email: saloon.email,
+			phone_no: saloon.phone_no,
+			password: hashPass
+		});
+		item.save(function(err){
+			if(err){
+				res.end('exists');
+			}else{
+				console.log('saved');
+				res.end(JSON.stringify(item));
+			}
+		});
 	}
 	
 	
