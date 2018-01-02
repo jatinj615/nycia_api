@@ -1,3 +1,5 @@
+import { Decimal128 } from '../../../.cache/typescript/2.6/node_modules/@types/bson';
+
 //libraries
 var express = require('express');
 var app = express();
@@ -31,7 +33,10 @@ var saloonSchema = mongoose.Schema({
 	address: String,
 	email: String,
 	password: String,
-	phone_no: String
+	phone_no: String,
+	type: Boolean,
+	latitude: Number,
+	longitude: Number
 });
 
 
@@ -44,22 +49,26 @@ app.get('/',function(req, res){
 	res.render('index');
 });
 
+
+//login for user and saloon
 app.post('/login', function(req, res){
 	//use token for different search for user and saloons
-	var token = 'users';
+	var token = 'saloons';
 	if(token == 'users'){
 		User.findOne({email: req.body.email},function(err,data){
-			if(err) throw err;
+			if(err){
+				res.end(0);
+			}
 			var hashPass = data.password;
 			if( bcrypt.compareSync(req.body.password,hashPass)){
 				res.end(JSON.stringify(data));
 			}
-		});
-		// console.log(JSON.stringify(user));
-		// res.end(user);		
+		});		
 	}else if(token == 'saloons'){
 		Saloon.findOne({email: req.body.email},function(err,data){
-			if(err) throw err;
+			if(err){
+				res.end(0);
+			}
 			var hashPass = data.password;
 			if( bcrypt.compareSync(req.body.password,hashPass)){
 				res.end(JSON.stringify(data));
@@ -68,6 +77,8 @@ app.post('/login', function(req, res){
 	}
 });
 
+
+//signup for user and saloon
 app.post('/signup',function(req, res){
 	//use token for different signup for user and saloons
 	var token = 'users'
@@ -98,6 +109,9 @@ app.post('/signup',function(req, res){
 			address: saloon.address,
 			email: saloon.email,
 			phone_no: saloon.phone_no,
+			type: saloon.type,
+			latitude: saloon.latitude,
+			longitude: saloon.longitude,
 			password: hashPass
 		});
 		item.save(function(err){
@@ -113,4 +127,4 @@ app.post('/signup',function(req, res){
 	
 });
 
-app.listen(4000);
+app.listen(8080);
