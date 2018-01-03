@@ -1,5 +1,3 @@
-import { Decimal128, ObjectId } from '../../../.cache/typescript/2.6/node_modules/@types/bson';
-
 //libraries
 var express = require('express');
 var app = express();
@@ -36,7 +34,7 @@ var saloonSchema = mongoose.Schema({
 	email: String,
 	password: String,
 	phone_no: String,
-	type: Boolean,
+	type: Number,
 	latitude: Number,
 	longitude: Number
 });
@@ -44,7 +42,7 @@ var saloonSchema = mongoose.Schema({
 var servicesSchema = mongoose.Schema({
 	name: String,
 	amount: Number,
-	saloon_id: Object,
+	saloon_id: Object
 });
 
 
@@ -95,7 +93,7 @@ app.post('/login', function(req, res){
 //signup for user and saloon
 app.post('/signup',function(req, res){
 	//use token for different signup for user and saloons
-	var token = 'users'
+	var token = 'saloons'
 	// console.log(req.body);
 	if(token == 'users'){
 		var user = req.body;
@@ -111,13 +109,13 @@ app.post('/signup',function(req, res){
 			if(err){
 				res.end('exists');
 			}else{
-				console.log('saved');
+				// console.log('saved');
 				res.end(JSON.stringify(item));
 			}
 		});
 	}else if(token == 'saloons'){
 		var saloon = req.body;
-		var hashPass = bcrypt.hashSync(user.password, 10);
+		var hashPass = bcrypt.hashSync(saloon.password, 10);
 		var item = Saloon({
 			name: saloon.name,
 			address: saloon.address,
@@ -125,16 +123,19 @@ app.post('/signup',function(req, res){
 			state: saloon.state,
 			email: saloon.email,
 			phone_no: saloon.phone_no,
-			type: saloon.type,
-			latitude: saloon.latitude,
-			longitude: saloon.longitude,
+			// type: saloon.type,
+			// latitude: saloon.latitude,
+			// longitude: saloon.longitude,
+			type: 0,
+			latitude: 0.002145435,
+			longitude: 0.1234562,
 			password: hashPass
 		});
 		item.save(function(err){
 			if(err){
 				res.end('exists');
 			}else{
-				console.log('saved');
+				// console.log('saved');
 				res.end(JSON.stringify(item));
 			}
 		});
