@@ -1,4 +1,4 @@
-import { Decimal128 } from '../../../.cache/typescript/2.6/node_modules/@types/bson';
+import { Decimal128, ObjectId } from '../../../.cache/typescript/2.6/node_modules/@types/bson';
 
 //libraries
 var express = require('express');
@@ -31,6 +31,8 @@ var userSchema = mongoose.Schema({
 var saloonSchema = mongoose.Schema({
 	name: String,
 	address: String,
+	locality: String,
+	state: String,
 	email: String,
 	password: String,
 	phone_no: String,
@@ -39,11 +41,19 @@ var saloonSchema = mongoose.Schema({
 	longitude: Number
 });
 
+var servicesSchema = mongoose.Schema({
+	name: String,
+	amount: Number,
+	saloon_id: Object,
+});
+
 
 
 //models for schemas
 var User = mongoose.model('User',userSchema);
 var Saloon = mongoose.model('Saloon',saloonSchema);
+var Services = mongoose.model('Services', servicesSchema);
+
 
 app.get('/',function(req, res){
 	res.render('index');
@@ -62,6 +72,8 @@ app.post('/login', function(req, res){
 			var hashPass = data.password;
 			if( bcrypt.compareSync(req.body.password,hashPass)){
 				res.end(JSON.stringify(data));
+			}else{
+				res.end(0);
 			}
 		});		
 	}else if(token == 'saloons'){
@@ -72,6 +84,8 @@ app.post('/login', function(req, res){
 			var hashPass = data.password;
 			if( bcrypt.compareSync(req.body.password,hashPass)){
 				res.end(JSON.stringify(data));
+			}else{
+				res.end(0);
 			}
 		});
 	}
@@ -107,6 +121,8 @@ app.post('/signup',function(req, res){
 		var item = Saloon({
 			name: saloon.name,
 			address: saloon.address,
+			locality: saloon.locality,
+			state: saloon.state,
 			email: saloon.email,
 			phone_no: saloon.phone_no,
 			type: saloon.type,
@@ -123,8 +139,16 @@ app.post('/signup',function(req, res){
 			}
 		});
 	}
-	
-	
+});
+
+app.post('/addServices', function(req, res){
+	var service = req.body;
+});
+
+
+app.post('/getSaloons', function(req, res){
+	var saloons = req.body;
+	Saloon.aggregate()
 });
 
 app.listen(8080);
