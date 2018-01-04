@@ -34,23 +34,17 @@ var saloonSchema = mongoose.Schema({
 	email: String,
 	password: String,
 	phone_no: String,
+	services: {type: Array, default: null},
+	timeslot: Number,
 	type: Number,
 	latitude: Number,
 	longitude: Number
 });
 
-var servicesSchema = mongoose.Schema({
-	name: String,
-	amount: Number,
-	saloon_id: Object
-});
-
-
 
 //models for schemas
 var User = mongoose.model('User',userSchema);
 var Saloon = mongoose.model('Saloon',saloonSchema);
-var Services = mongoose.model('Services', servicesSchema);
 
 
 app.get('/',function(req, res){
@@ -126,6 +120,7 @@ app.post('/signup',function(req, res){
 			// type: saloon.type,
 			// latitude: saloon.latitude,
 			// longitude: saloon.longitude,
+			timeslot: 0,
 			type: 0,
 			latitude: 0.002145435,
 			longitude: 0.1234562,
@@ -144,12 +139,22 @@ app.post('/signup',function(req, res){
 
 app.post('/addServices', function(req, res){
 	var service = req.body;
+	Saloon.update({_id: "5a4cb99daa7b88285f930dbf"},{ $push: {services:{
+		name: service.name,
+		amount: service.amount}
+		}
+	}, function(err){
+		if(err){
+
+		}else{
+			res.end("added successfully");
+		}
+	});
 });
 
 
 app.post('/getSaloons', function(req, res){
 	var saloons = req.body;
-	Saloon.aggregate()
 });
 
 app.listen(8080);
