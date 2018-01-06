@@ -139,13 +139,13 @@ app.post('/signup',function(req, res){
 
 app.post('/addServices', function(req, res){
 	var service = req.body;
-	Saloon.update({_id: "5a4cb99daa7b88285f930dbf"},{ $push: {services:{
+	Saloon.update({_id: req.email },{ $push: {services:{
 		name: service.name,
 		amount: service.amount}
 		}
 	}, function(err){
 		if(err){
-
+			res.end(0);
 		}else{
 			res.end("added successfully");
 		}
@@ -155,6 +155,14 @@ app.post('/addServices', function(req, res){
 
 app.post('/getSaloons', function(req, res){
 	var saloons = req.body;
+	Saloon.find({$and: [{locality: saloons.locality}, {services: {$elemMatch: {name: saloons.service_name}}}]}, function(err, data){
+		// console.log(data.length);
+		if(err || data == null || data.length == 0){
+			res.end(JSON.stringify(0));
+		}else{
+			res.end(JSON.stringify(data));
+		}
+	});
 });
 
 app.listen(8080);
