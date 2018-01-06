@@ -46,7 +46,8 @@ var bookingSchema = mongoose.Schema({
 	saloon_email: String,
 	user_email: String,
 	service: String,
-	amount: String
+	amount: String,
+	date: Date
 });
 
 
@@ -185,7 +186,8 @@ app.post('/bookService', function(req, res){
 		saloon_email: booking.saloon_email,
 		user_email: booking.user_email,
 		service: booking.service,
-		amount: booking.amount
+		amount: booking.amount,
+		date: booking.date
 	});
 	book.save(function(err){
 		if(err){
@@ -197,7 +199,29 @@ app.post('/bookService', function(req, res){
 });
 
 //get User Bookings
+app.post('/getUserBookings', function(req,res){
+	var user = req.body;
+	Booking.find({user_email: user.email}, function(err, data){
+		if(err || data.length == 0){
+			res.end(JSON.stringify(0));
+		}else{
+			res.end(JSON.stringify(data));
+		}
+	});
+});
 
+
+//get Saloons Bookings
+app.post('/getSaloonBookings', function(req, res){
+	var saloon = req.body;
+	Booking.find({saloon_email: saloon.email}, function(err, data){
+		if(err || data.length == 0){
+			res.end(JSON.stringify(0));
+		}else{
+			res.end(JSON.stringify(data));
+		}
+	});
+});
 
 
 app.listen(8080);
