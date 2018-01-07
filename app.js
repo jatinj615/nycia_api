@@ -44,10 +44,16 @@ var saloonSchema = mongoose.Schema({
 //bookings schema
 var bookingSchema = mongoose.Schema({
 	saloon_email: String,
+	saloon_phone: String,
+	user_phone: String,
 	user_email: String,
 	service: String,
 	amount: String,
-	date: Date
+	date: Date,
+	from_time: String,
+	to_time: String,
+	status: String,
+	time: String
 });
 
 
@@ -184,10 +190,13 @@ app.post('/bookService', function(req, res){
 	var booking = req.body;
 	var book = Booking({
 		saloon_email: booking.saloon_email,
+		saloon_phone: booking.saloon_phone,
+		user_phone: booking.user_phone,
 		user_email: booking.user_email,
 		service: booking.service,
 		amount: booking.amount,
-		date: booking.date
+		date: booking.date,
+		status: 'booked'
 	});
 	book.save(function(err){
 		if(err){
@@ -222,6 +231,8 @@ app.post('/getSaloonBookings', function(req, res){
 		}
 	});
 });
+
+
 
 
 app.listen(8080);
