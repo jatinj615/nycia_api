@@ -35,7 +35,9 @@ var saloonSchema = mongoose.Schema({
 	password: String,
 	phone_no: String,
 	services: {type: Array, default: null},
-	seats: Number,
+	seats: {type: Number, default: null},
+	url: {type: Array, default: null},
+	logo: {type: Array, default: null},
 	type: Number,
 	latitude: Number,
 	longitude: Number
@@ -49,11 +51,8 @@ var bookingSchema = mongoose.Schema({
 	user_email: String,
 	service: String,
 	amount: String,
-	date: Date,
-	from_time: String,
-	to_time: String,
 	status: String,
-	time: String
+	date: String
 });
 
 
@@ -154,6 +153,17 @@ app.post('/signup',function(req, res){
 	}
 });
 
+//set seats of the saloon for today
+app.post('/setSeats',function(req,res){
+	var saloon = req.body;
+	Saloon.updateOne({email: saloon.email},{seats: saloon.seats},function(err, data){
+		if(err){
+			res.end('0');
+		}else{
+			res.end('1');
+		}
+	});
+});
 
 //add services to saloons
 app.post('/addServices', function(req, res){
@@ -188,23 +198,34 @@ app.post('/getSaloons', function(req, res){
 //setBooking for users
 app.post('/bookService', function(req, res){
 	var booking = req.body;
-	var book = Booking({
-		saloon_email: booking.saloon_email,
-		saloon_phone: booking.saloon_phone,
-		user_phone: booking.user_phone,
-		user_email: booking.user_email,
-		service: booking.service,
-		amount: booking.amount,
-		date: booking.date,
-		status: 'booked'
-	});
-	book.save(function(err){
-		if(err){
-			res.end(JSON.stringify(0));	
+	//today's date
+	var date = new Date();
+	var d = date.getDate()+'-'+date.getMonth()+1+'-'+date.getFullYear();
+	Booking.find({saloon_email: booking.saloon_email, date: d}, function(err, data){
+		//get seats of saloons from application
+		if(data.length < booking.saloon_seats){
+			var book = Booking({
+				saloon_email: booking.saloon_email,
+				saloon_phone: booking.saloon_phone,
+				user_phone: booking.user_phone,
+				user_email: booking.user_email,
+				service: booking.service,
+				amount: booking.amount,
+				status: 'booked',
+				date: d,
+			});
+			book.save(function(err){
+				if(err){
+					res.end(JSON.stringify(0));
+				}else{
+					res.end('Booked successfully');
+				}
+			});
 		}else{
-			res.end('Booked successfully')
+			res.end('Not Available');
 		}
 	});
+	
 });
 
 //get User Bookings
@@ -231,8 +252,6 @@ app.post('/getSaloonBookings', function(req, res){
 		}
 	});
 });
-
-
 
 
 app.listen(8080);
