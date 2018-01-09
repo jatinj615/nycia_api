@@ -4,13 +4,15 @@ var app = express();
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var bodyParser = require('body-parser');
-
+var fileupload = require('express-fileupload');
+var fs = require('fs');
 
 //database connect
 mongoose.connect('mongodb://localhost/nycia');
 
 //bodyparser
 app.use(bodyParser());
+app.use(fileupload());
 //set viewEngine
 app.set('view engine', 'ejs');
 
@@ -136,7 +138,7 @@ app.post('/signup',function(req, res){
 			// type: saloon.type,
 			// latitude: saloon.latitude,
 			// longitude: saloon.longitude,
-			seats: 0,
+			seats: 10,
 			type: 0,
 			latitude: 0.002145435,
 			longitude: 0.1234562,
@@ -153,6 +155,7 @@ app.post('/signup',function(req, res){
 	}
 });
 
+
 //set seats of the saloon for today
 app.post('/setSeats',function(req,res){
 	var saloon = req.body;
@@ -164,6 +167,7 @@ app.post('/setSeats',function(req,res){
 		}
 	});
 });
+
 
 //add services to saloons
 app.post('/addServices', function(req, res){
@@ -194,6 +198,7 @@ app.post('/getSaloons', function(req, res){
 		}
 	});
 });
+
 
 //setBooking for users
 app.post('/bookService', function(req, res){
@@ -228,6 +233,7 @@ app.post('/bookService', function(req, res){
 	
 });
 
+
 //get User Bookings
 app.post('/getUserBookings', function(req,res){
 	var user = req.body;
@@ -253,5 +259,34 @@ app.post('/getSaloonBookings', function(req, res){
 	});
 });
 
+app.post('/uploadPics', function(req, res){
+	var path = __dirname+'/'+req.body.saloon_email;
+	var i;
+	for(i = 0; i < 1; i++){
+		var image = req.files.image;
+		if(!fs.existsSync(path)){
+			fs.mkdirSync(path);
+		}
+		image.mv(path+'/'+image.name, function(err){
+			if(err){
+				console.log(err);
+			}else{
+				Saloon.update({email: req.body.saloon_email},{$push: {
+					url: {
+						picurl: path+'/'+image.name,
+					}
+				}}, function(err){
+					if(err){
+						res.end('0');
+					}else{
+						res.end('1');
+					}
+				});
+			}
+		});
+	}
+	
+});
 
+console.log(__dirname);
 app.listen(8080);
