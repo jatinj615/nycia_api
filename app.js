@@ -39,7 +39,7 @@ var saloonSchema = mongoose.Schema({
 	services: {type: Array, default: null},
 	seats: {type: Number, default: null},
 	url: {type: Array, default: null},
-	logo: {type: Array, default: null},
+	logo: {type: String, default: null},
 	type: Number,
 	latitude: Number,
 	longitude: Number
@@ -134,14 +134,14 @@ app.post('/signup',function(req, res){
 			state: saloon.state,
 			email: saloon.email,
 			phone_no: saloon.phone_no,
-			// seats: saloon.seats,
-			// type: saloon.type,
-			// latitude: saloon.latitude,
-			// longitude: saloon.longitude,
-			seats: 10,
-			type: 0,
-			latitude: 0.002145435,
-			longitude: 0.1234562,
+			seats: saloon.seats,
+			type: saloon.type,
+			latitude: saloon.latitude,
+			longitude: saloon.longitude,
+			// seats: 10,
+			// type: 0,
+			// latitude: 0.002145435,
+			// longitude: 0.1234562,
 			password: hashPass
 		});
 		item.save(function(err){
@@ -259,17 +259,19 @@ app.post('/getSaloonBookings', function(req, res){
 	});
 });
 
+
+//upload pics of saloon
 app.post('/uploadPics', function(req, res){
 	var path = __dirname+'/'+req.body.saloon_email;
 	var i;
-	for(i = 0; i < 1; i++){
-		var image = req.files.image;
+	for(i = 0; i < 1; i++){//change upper limit according to images
+		var image = req.files.image;//change single image to array of images
 		if(!fs.existsSync(path)){
 			fs.mkdirSync(path);
 		}
 		image.mv(path+'/'+image.name, function(err){
 			if(err){
-				console.log(err);
+				res.end('0');
 			}else{
 				Saloon.update({email: req.body.saloon_email},{$push: {
 					url: {
@@ -288,5 +290,53 @@ app.post('/uploadPics', function(req, res){
 	
 });
 
-console.log(__dirname);
+
+//upload logo
+app.post('/uploadLogo', function(req, res){
+	var path = __dirname+'/'+req.body.saloon_email+'/logo';
+	var logo = req.files.logo;
+	if(!fs.existsSync(path)){
+		fs.mkdirSync(path);
+	}
+	logo.mv(path+'/'+logo.name, function(err){
+		if(err){
+			res.end('0');
+		}else{
+			Saloon.update({email: req.body.saloon_email},{$push: {
+				logo: path+'/'+logo.name
+			}}, function(err){
+					if(err){
+						res.end('0');
+					}else{
+						res.end('1');
+					}
+			});
+		}
+	});
+});
+
+//update saloon info
+app.post('/updateSaloon', function(req, res){
+	var saloon = req.body;
+	var hashPass = bcrypt.hashSync(saloon.password, 10);
+	Saloon.Update({email: saloon.email},{
+		name: saloon.name,
+		address: saloon.address,
+		locality: saloon.locality,
+		state: saloon.state,
+		phone_no: saloon.phone_no,
+		seats: saloon.seats,
+		type: saloon.type,
+		latitude: saloon.latitude,
+		longitude: saloon.longitude,
+		password: hashPass
+	}, function(err){
+		if(err){
+			res.end('0');
+		}else{
+			res.end('1');
+		}
+	});
+});
+
 app.listen(8080);
