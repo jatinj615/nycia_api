@@ -72,7 +72,7 @@ app.get('/',function(req, res){
 //login for user and saloon
 app.post('/login', function(req, res){
 	//use token for different search for user and saloons
-	var token = 'saloons';
+	var token = req.body.token;
 	if(token == 'users'){
 		User.findOne({email: req.body.email},function(err,data){
 			if(err || data.length == 0){
@@ -104,7 +104,7 @@ app.post('/login', function(req, res){
 //signup for user and saloon
 app.post('/signup',function(req, res){
 	//use token for different signup for user and saloons
-	var token = 'saloons'
+	var token = req.body.token;
 	// console.log(req.body);
 	if(token == 'users'){
 		var user = req.body;
