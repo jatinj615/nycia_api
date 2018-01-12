@@ -72,10 +72,11 @@ app.get('/',function(req, res){
 //login for user and saloon
 app.post('/login', function(req, res){
 	//use token for different search for user and saloons
-	var token = req.body.token;
+	// var token = req.body.token;
+	var token = 'users';
 	if(token == 'users'){
 		User.findOne({email: req.body.email},function(err,data){
-			if(err || data.length == 0){
+			if(err || data == null){
 				res.end(JSON.stringify(0));
 			}
 			var hashPass = data.password;
@@ -87,7 +88,7 @@ app.post('/login', function(req, res){
 		});		
 	}else if(token == 'saloons'){
 		Saloon.findOne({email: req.body.email},function(err,data){
-			if(err || data.length == 0){
+			if(err || data == null){
 				res.end(JSON.stringify(0));
 			}
 			var hashPass = data.password;
@@ -191,7 +192,7 @@ app.post('/getSaloons', function(req, res){
 	var saloons = req.body;
 	Saloon.find({$and: [{locality: saloons.locality}, {services: {$elemMatch: {name: saloons.service_name}}}]}, function(err, data){
 		// console.log(data.length);
-		if(err || data == null || data.length == 0){
+		if(err || data == null){
 			res.end(JSON.stringify(0));
 		}else{
 			res.end(JSON.stringify(data));
@@ -238,7 +239,7 @@ app.post('/bookService', function(req, res){
 app.post('/getUserBookings', function(req,res){
 	var user = req.body;
 	Booking.find({user_email: user.email}, function(err, data){
-		if(err || data.length == 0){
+		if(err || data == null){
 			res.end(JSON.stringify(0));
 		}else{
 			res.end(JSON.stringify(data));
@@ -251,7 +252,7 @@ app.post('/getUserBookings', function(req,res){
 app.post('/getSaloonBookings', function(req, res){
 	var saloon = req.body;
 	Booking.find({saloon_email: saloon.email}, function(err, data){
-		if(err || data.length == 0){
+		if(err || data == null){
 			res.end(JSON.stringify(0));
 		}else{
 			res.end(JSON.stringify(data));
